@@ -1,9 +1,14 @@
+import 'dotenv/config';
 import app from './app';
-// import dotenv from 'dotenv';
+import client from './src/DB/client';
 
-// dotenv.config();
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+client.connect(() => {
+  console.log('DB Client is connected');
+
+  // TODO: fix this, put outside of promise and use await rather
+  app.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
+  });
 });
