@@ -1,5 +1,5 @@
 import pg from 'pg';
-const { Client, Query } = pg;
+const { Client } = pg;
 
 const client = new Client({
   database: process.env.DB_DATABASE,
