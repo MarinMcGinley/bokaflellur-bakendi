@@ -4,10 +4,10 @@
   "description": "Bakendi sem heldur utan um notendur, bækur, lista og blogg fyrir Bókaflellur. Auðkenningu líka.",
   "main": "index.js",
   "scripts": {
-    "test": "test",
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon index.ts"
+    "dev": "nodemon index.ts",
+    "setup": "nodemon setup.ts"
   },
   "author": "Marín Ingibjörg McGinley",
   "license": "ISC",

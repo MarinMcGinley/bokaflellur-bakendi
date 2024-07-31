@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     picture VARCHAR(100) NOT NULL,
     email VARCHAR(50) NOT NULL,
     created TIMESTAMPTZ NOT NULL,
-    last_updated TIMESTAMPTZ NOT NULL,
+    last_updated TIMESTAMPTZ NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS book_lists (
@@ -17,12 +17,12 @@ CREATE TABLE IF NOT EXISTS book_lists (
     description VARCHAR(300),
     published BOOLEAN NOT NULL,
     created TIMESTAMPTZ NOT NULL,
-    last_updated TIMESTAMPTZ NOT NULL,
+    last_updated TIMESTAMPTZ NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS books (
     id INT PRIMARY KEY,
-    title VARCHAR(50) NOT NULL
+    title VARCHAR(50) NOT NULL,
     author VARCHAR(50) NOT NULL,
     link VARCHAR(50) NOT NULL,
     recommender_id INT NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS books (
             REFERENCES book_lists(id)
 );
 
-CREATE TABLE IF NOT EXISTS blog (
+CREATE TABLE IF NOT EXISTS blogs (
     id INT PRIMARY KEY,
     content TEXT NOT NULL,
     draft BOOLEAN NOT NULL,
@@ -50,5 +50,5 @@ CREATE TABLE IF NOT EXISTS blog (
             REFERENCES users(id),
     CONSTRAINT fk_book
         FOREIGN KEY(book_id)
-            REFERENCES books(id),
+            REFERENCES books(id)
 );
