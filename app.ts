@@ -48,7 +48,7 @@ app.get('/users', getUsers);
 
 app.get('/booklists/:id', getBookList);
 app.post('/booklists', createBookList);
-app.put('/booklists', updateBookList);
+app.put('/booklists/:id', updateBookList);
 app.delete('/booklists/:id', deleteBookList);
 app.get('/booklists', getBookLists);
 

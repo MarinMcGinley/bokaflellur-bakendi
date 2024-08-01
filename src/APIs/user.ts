@@ -98,9 +98,6 @@ const getUsers = async (_req: Request, res: Response) => {
 
   const results = await query(queryString);
 
-  if (results.rows.length == 0) {
-    res.status(404).send();
-  }
   res.send(results.rows);
 };
 
