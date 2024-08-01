@@ -13,8 +13,12 @@ client.on('error', (error: Error) => {
   console.log('DB client error', error);
 });
 
-const query = async (queryString: string) => {
-  const result = await client.query(queryString);
+type t = Parameters<typeof client.query>;
+
+type s = t[number];
+
+const query = async (queryText: string, values?: Array<string | number>) => {
+  const result = await client.query(queryText, values);
   return result;
 };
 

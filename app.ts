@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express } from 'express';
 import {
   createBook,
   deleteBook,
@@ -6,7 +6,13 @@ import {
   getBooks,
   updateBook,
 } from './src/APIs/book';
-import { createUser, deleteUser, getUser, updateUser } from './src/APIs/user';
+import {
+  createUser,
+  deleteUser,
+  getUser,
+  getUsers,
+  updateUser,
+} from './src/APIs/user';
 import {
   createBookList,
   deleteBookList,
@@ -17,9 +23,14 @@ import {
 
 const app: Express = express();
 
+app.use(express.json());
+
+/**
+ * Add authorization and authentication
+ */
 app.get('/books/:id', getBook);
 app.post('/books', createBook);
-app.put('/books', updateBook);
+app.put('/books/:id', updateBook);
 app.delete('/books/:id', deleteBook);
 app.get('/books', getBooks);
 
@@ -31,9 +42,9 @@ app.get('/blogs', getBooks);
 
 app.get('/users/:id', getUser);
 app.post('/users', createUser);
-app.put('/users', updateUser);
+app.put('/users/:id', updateUser);
 app.delete('/users/:id', deleteUser);
-app.get('/users', getUser);
+app.get('/users', getUsers);
 
 app.get('/booklists/:id', getBookList);
 app.post('/booklists', createBookList);

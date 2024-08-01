@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import { client, query } from './src/DB/client';
 
-const { readFile } = require('node:fs/promises');
+import { readFile } from 'node:fs/promises';
 
 const setup = async () => {
   await client.connect();
