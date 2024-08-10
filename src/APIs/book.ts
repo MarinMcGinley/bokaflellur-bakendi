@@ -116,7 +116,6 @@ const updateBook = async (req: Request, res: Response) => {
       ${bookListId ? `book_list_id = '${bookListId}', ` : ''}
       last_updated = '${currentDate}'
     WHERE id = ${id}`;
-  console.log({ queryString });
 
   await query(queryString);
 

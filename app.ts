@@ -20,6 +20,13 @@ import {
   getBookLists,
   updateBookList,
 } from './src/APIs/bookList';
+import {
+  createBlog,
+  deleteBlog,
+  getBlog,
+  getBlogs,
+  updateBlog,
+} from './src/APIs/blog';
 
 const app: Express = express();
 
@@ -34,11 +41,11 @@ app.put('/books/:id', updateBook);
 app.delete('/books/:id', deleteBook);
 app.get('/books', getBooks);
 
-app.get('/blogs/:id', getBook);
-app.post('/blogs', createBook);
-app.put('/blogs', updateBook);
-app.delete('/blogs/:id', deleteBook);
-app.get('/blogs', getBooks);
+app.get('/blogs/:id', getBlog);
+app.post('/blogs', createBlog);
+app.put('/blogs/:id', updateBlog);
+app.delete('/blogs/:id', deleteBlog);
+app.get('/blogs', getBlogs);
 
 app.get('/users/:id', getUser);
 app.post('/users', createUser);
