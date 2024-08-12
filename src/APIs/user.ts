@@ -5,9 +5,10 @@ import {
   creatingUserValidation,
   updatingUserValidation,
 } from '../validation/userValidation';
+import { errorHelper } from './helpers';
 
 const getUser = async (req: Request, res: Response) => {
-  try {
+  errorHelper(req, res, async (req, res) => {
     const id = req.params.id;
 
     idValidation(id);
@@ -24,29 +25,17 @@ const getUser = async (req: Request, res: Response) => {
       res.status(404).send();
     }
     res.send(results.rows[0]);
-  } catch (e) {
-    console.error({ error: e });
-    if ((e as Error).message) {
-      res.status(400).send({
-        status: 400,
-        message: (e as Error).message,
-      });
-    } else {
-      res.status(500).send({
-        status: 500,
-        message: e,
-      });
-    }
-  }
+  });
 };
 
 const createUser = async (req: Request, res: Response) => {
-  const { firstName, lastName, role, pictureUrl, email } = req.body;
+  errorHelper(req, res, async (req, res) => {
+    const { firstName, lastName, role, pictureUrl, email } = req.body;
 
-  /**
-   * TODO: only allow admin to create user
-   */
-  try {
+    /**
+     * TODO: only allow admin to create user
+     */
+
     await creatingUserValidation({
       firstName,
       lastName,
@@ -82,28 +71,15 @@ const createUser = async (req: Request, res: Response) => {
 
     const results = await query(queryString, values);
     res.send(results.rows[0]);
-  } catch (e) {
-    console.error({ error: e });
-    if ((e as Error).message) {
-      res.status(400).send({
-        status: 400,
-        message: (e as Error).message,
-      });
-    } else {
-      res.status(500).send({
-        status: 500,
-        message: e,
-      });
-    }
-  }
+  });
 };
 
 const updateUser = async (req: Request, res: Response) => {
-  // TODO: only allow authorised user or admin to update his/her user
-  const { firstName, lastName, pictureUrl, email } = req.body;
+  errorHelper(req, res, async (req, res) => {
+    // TODO: only allow authorised user or admin to update his/her user
+    const { firstName, lastName, pictureUrl, email } = req.body;
 
-  const { id } = req.params;
-  try {
+    const { id } = req.params;
     idValidation(id);
     await updatingUserValidation({
       firstName,
@@ -128,64 +104,33 @@ const updateUser = async (req: Request, res: Response) => {
     await query(queryString);
 
     res.status(204).send();
-  } catch (e) {
-    console.error({ error: e });
-    if ((e as Error).message) {
-      res.status(400).send({
-        status: 400,
-        message: (e as Error).message,
-      });
-    } else {
-      res.status(500).send({
-        status: 500,
-        message: e,
-      });
-    }
-  }
+  });
 };
 
 const deleteUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  /**
-   * TODO: only allow admins to delete
-   */
-  try {
+  errorHelper(req, res, async (req, res) => {
+    const { id } = req.params;
+    /**
+     * TODO: only allow admins to delete
+     */
+
     idValidation(id);
 
     const queryString = `DELETE FROM users WHERE id = ${id}`;
 
     const result = await query(queryString);
     res.status(204).send(result);
-  } catch (e) {
-    console.error({ error: e });
-    if ((e as Error).message) {
-      res.status(400).send({
-        status: 400,
-        message: (e as Error).message,
-      });
-    } else {
-      res.status(500).send({
-        status: 500,
-        message: e,
-      });
-    }
-  }
+  });
 };
 
-const getUsers = async (_req: Request, res: Response) => {
-  try {
+const getUsers = async (req: Request, res: Response) => {
+  errorHelper(req, res, async (_req, res) => {
     const queryString = `SELECT id, first_name, last_name, role, picture, email FROM users`;
 
     const results = await query(queryString);
 
     res.send(results.rows);
-  } catch (e) {
-    console.error({ error: e });
-    res.status(500).send({
-      status: 500,
-      message: e,
-    });
-  }
+  });
 };
 
 export { getUser, createUser, updateUser, deleteUser, getUsers };
