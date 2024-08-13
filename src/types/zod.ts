@@ -28,7 +28,7 @@ export type BookList = z.infer<typeof bookList>;
 export const blog = z.object({
   content: z.string(),
   draft: z.boolean(),
-  blog_author_id: z.string(),
-  book_id: z.string(),
+  blogAuthorId: z.number(),
+  bookId: z.number(),
 });
 export type Blog = z.infer<typeof blog>;

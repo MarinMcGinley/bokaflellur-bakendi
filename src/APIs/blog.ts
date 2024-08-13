@@ -1,11 +1,19 @@
 import { Request, Response } from 'express';
 import { query } from '../DB/client';
+import { errorHelper } from './helpers';
+import { idValidation } from '../validation/baseValidation';
+import {
+  creatingBlogValidation,
+  updatingBlogValidation,
+} from '../validation/blogValidation';
 
 const getBlog = async (req: Request, res: Response) => {
-  const id = req.params.id;
+  errorHelper(req, res, async (req, res) => {
+    const id = req.params.id;
+    idValidation(id);
 
-  // LEFT OUTER JOIN just in case the rules will change later
-  const queryString = `
+    // LEFT OUTER JOIN just in case the rules will change later
+    const queryString = `
     SELECT 
       blogs.id, 
       content, 
@@ -21,50 +29,25 @@ const getBlog = async (req: Request, res: Response) => {
     WHERE blogs.id = ${id}
   `;
 
-  const results = await query(queryString);
+    const results = await query(queryString);
 
-  if (results.rows.length == 0) {
-    res.status(404).send();
-  }
-  res.send(results.rows[0]);
+    if (results.rows.length == 0) {
+      res.status(404).send();
+    }
+    res.send(results.rows[0]);
+  });
 };
 
 const createBlog = async (req: Request, res: Response) => {
-  const { content, draft, blogAuthorId, bookId } = req.body;
+  errorHelper(req, res, async (req, res) => {
+    // TODO: only allow user to create blog
+    const { content, draft, blogAuthorId, bookId } = req.body;
 
-  /**
-   * TODO: validate values from body
-   */
+    await creatingBlogValidation({ content, draft, blogAuthorId, bookId });
 
-  const userQueryString = `SELECT * FROM users WHERE id = ${blogAuthorId}`;
-  const bookQueryString = `SELECT * FROM books WHERE id = ${bookId}`;
+    const currentDate = new Date().toISOString();
 
-  const bookResult = query(bookQueryString);
-  const userResult = query(userQueryString);
-
-  const [awaitedBook, awaitedUser] = await Promise.all([
-    bookResult,
-    userResult,
-  ]);
-
-  if (awaitedUser.rows.length === 0) {
-    res.status(404).send({
-      status: 404,
-      message: 'No user with this ID exists',
-    });
-    return;
-  }
-  if (awaitedBook.rows.length === 0) {
-    res.status(404).send({
-      status: 404,
-      message: 'No book with this ID exists',
-    });
-    return;
-  }
-
-  const currentDate = new Date().toISOString();
-
-  const queryString = `
+    const queryString = `
     INSERT INTO blogs(
       content,
       draft,
@@ -76,57 +59,32 @@ const createBlog = async (req: Request, res: Response) => {
      $1, $2, $3, $4, $5, $6
     ) RETURNING *`;
 
-  const values = [
-    content,
-    draft,
-    blogAuthorId,
-    bookId,
-    currentDate,
-    currentDate,
-  ];
+    const values = [
+      content,
+      draft,
+      blogAuthorId,
+      bookId,
+      currentDate,
+      currentDate,
+    ];
 
-  const results = await query(queryString, values);
-  res.send(results.rows[0]);
+    const results = await query(queryString, values);
+    res.send(results.rows[0]);
+  });
 };
 
 const updateBlog = async (req: Request, res: Response) => {
-  const { content, draft, blogAuthorId, bookId } = req.body;
-  const { id } = req.params;
+  errorHelper(req, res, async (req, res) => {
+    //TODO: only allow user and admin to update his/her own blog
+    const { content, draft, blogAuthorId, bookId } = req.body;
+    const { id } = req.params;
 
-  // TODO: what if bookId or blogAuthorId is not being updated?
-  // const userQueryString = `SELECT * FROM users WHERE id = ${blogAuthorId}`;
-  // const bookQueryString = `SELECT * FROM books WHERE id = ${bookId}`;
+    idValidation(id);
+    await updatingBlogValidation({ content, draft, blogAuthorId, bookId, id });
 
-  // const bookResult = query(bookQueryString);
-  // const userResult = query(userQueryString);
+    const currentDate = new Date().toISOString();
 
-  // const [awaitedBook, awaitedUser] = await Promise.all([
-  //   bookResult,
-  //   userResult,
-  // ]);
-
-  // if (awaitedUser.rows.length === 0) {
-  //   res.status(404).send({
-  //     status: 404,
-  //     message: 'No user with this ID exists',
-  //   });
-  //   return;
-  // }
-  // if (awaitedBook.rows.length === 0) {
-  //   res.status(404).send({
-  //     status: 404,
-  //     message: 'No book with this ID exists',
-  //   });
-  //   return;
-  // }
-
-  const currentDate = new Date().toISOString();
-
-  /**  TODO: add validation
-   * check first if item with this id exists
-   */
-
-  const queryString = `
+    const queryString = `
     UPDATE blogs 
       SET
       ${content ? `content = '${content.replace(`'`, `''`)}', ` : ''}
@@ -136,26 +94,31 @@ const updateBlog = async (req: Request, res: Response) => {
       last_updated = '${currentDate}'
     WHERE id = ${id}`;
 
-  await query(queryString);
+    await query(queryString);
 
-  res.status(204).send();
+    res.status(204).send();
+  });
 };
 
 const deleteBlog = async (req: Request, res: Response) => {
-  /**
-   * TODO: only allow admins to delete
-   */
+  errorHelper(req, res, async (req, res) => {
+    /**
+     * TODO: only allow admins to delete
+     */
 
-  const { id } = req.params;
+    const { id } = req.params;
+    idValidation(id);
 
-  const queryString = `DELETE FROM blogs WHERE id = ${id}`;
+    const queryString = `DELETE FROM blogs WHERE id = ${id}`;
 
-  const result = await query(queryString);
-  res.status(204).send(result);
+    const result = await query(queryString);
+    res.status(204).send(result);
+  });
 };
 
 const getBlogs = async (req: Request, res: Response) => {
-  const queryString = `
+  errorHelper(req, res, async (req, res) => {
+    const queryString = `
     SELECT 
       blogs.id, 
       content, 
@@ -169,9 +132,10 @@ const getBlogs = async (req: Request, res: Response) => {
       LEFT OUTER JOIN users ON blogs.blog_author_id = users.id
       LEFT OUTER JOIN books ON blogs.book_id = books.id`;
 
-  const results = await query(queryString);
+    const results = await query(queryString);
 
-  res.send(results.rows);
+    res.send(results.rows);
+  });
 };
 
 export { getBlog, createBlog, updateBlog, deleteBlog, getBlogs };
