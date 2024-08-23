@@ -30,7 +30,7 @@ const getUser = async (req: Request, res: Response) => {
 
 const createUser = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
-    const { firstName, lastName, role, pictureUrl, email } = req.body;
+    const { firstName, lastName, role, pictureUrl, email, password } = req.body;
 
     /**
      * TODO: only allow admin to create user
@@ -42,6 +42,7 @@ const createUser = async (req: Request, res: Response) => {
       role,
       pictureUrl,
       email,
+      password,
     });
 
     const currentDate = new Date().toISOString();
@@ -53,10 +54,11 @@ const createUser = async (req: Request, res: Response) => {
       role, 
       picture, 
       email, 
+      password,
       created, 
       last_updated
     ) VALUES(
-     $1, $2, $3, $4, $5, $6, $7
+     $1, $2, $3, $4, $5, $6, $7, $8
     ) RETURNING *`;
 
     const values = [
@@ -77,7 +79,7 @@ const createUser = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
     // TODO: only allow authorised user or admin to update his/her user
-    const { firstName, lastName, pictureUrl, email } = req.body;
+    const { firstName, lastName, pictureUrl, email, password } = req.body;
 
     const { id } = req.params;
     idValidation(id);
@@ -87,6 +89,7 @@ const updateUser = async (req: Request, res: Response) => {
       pictureUrl,
       email,
       id,
+      password,
     });
 
     const currentDate = new Date().toISOString();
@@ -98,6 +101,7 @@ const updateUser = async (req: Request, res: Response) => {
       ${lastName ? `last_name = '${lastName}', ` : ''}
       ${pictureUrl ? `picture = '${pictureUrl}', ` : ''} 
       ${email ? `email = '${email}', ` : ''}
+      ${password ? `password = '${password}', ` : ''}
       last_updated = '${currentDate}'
     WHERE id = ${id}`;
 

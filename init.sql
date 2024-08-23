@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(10) NOT NULL,
     picture VARCHAR(100) NOT NULL,
     email VARCHAR(50) NOT NULL,
+    password VARCHAR(100) NOT NULL,
     created TIMESTAMPTZ NOT NULL,
     last_updated TIMESTAMPTZ NOT NULL
 );
