@@ -1,12 +1,13 @@
 import { ExtractJwt, Strategy, VerifyCallback } from 'passport-jwt';
 import passport, { AuthenticateCallback } from 'passport';
-import { comparePasswords, findUserByEmail, findUserById } from './users';
+import { findUserByEmail, findUserById } from './users';
 import express, { NextFunction } from 'express';
 import { Request, Response } from 'express';
 import { loginValidation } from '../validation/userValidation';
 import { errorHelper } from '../APIs/helpers';
 import { sign } from 'jsonwebtoken';
 import { User } from '../types/zod';
+import { comparePasswords } from './crypt';
 
 const tokenLifetime = 60 * 60 * 24 * 7 * 4; // 28 dagar
 
@@ -19,6 +20,7 @@ const opt = {
 };
 
 const strategy: VerifyCallback = async (payload, done) => {
+  console.log({ userpayload: payload });
   const user = await findUserById(payload.id);
   if (user) {
     return done(null, user);
@@ -31,7 +33,7 @@ passport.use(new Strategy(opt, strategy));
 
 app.use(passport.initialize());
 
-export const checkUserIsAdmin = (
+export const requireAdmin = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -41,6 +43,14 @@ export const checkUserIsAdmin = (
   }
 
   return res.status(403).send({ status: 403, message: 'Forbidden' });
+};
+
+export const requireAdminOrPersonalUser = (userId: number, user: any) => {
+  if (
+    !((user && (user as User).role === 'admin') || (user as User).id === userId)
+  ) {
+    throw new Error('Forbidden');
+  }
 };
 
 export const requireAuth = (
@@ -78,11 +88,13 @@ export const requireAuth = (
 
 export const loginRoute = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    loginValidation(username, password);
+    loginValidation(email, password);
 
-    const user = await findUserByEmail(username);
+    console.log('lsdkjfsdlkfj');
+    const user = await findUserByEmail(email);
+    console.log({ user });
 
     if (!user) {
       return res.status(401).send({ status: 401, message: 'No such user' });

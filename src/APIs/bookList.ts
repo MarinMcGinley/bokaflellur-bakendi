@@ -32,7 +32,6 @@ const createBookList = async (req: Request, res: Response) => {
     const { name, description, published } = req.body;
 
     await creatingBookListValidation({ name, description, published });
-    // only allow admin to create a book bookList
 
     const currentDate = new Date().toISOString();
 
@@ -60,9 +59,12 @@ const updateBookList = async (req: Request, res: Response) => {
     const { name, description, published } = req.body;
 
     idValidation(id);
-    await updatingBookListValidation({ name, description, published, id });
-
-    // TODO: only allow admin to edit a bookList
+    await updatingBookListValidation({
+      name,
+      description,
+      published,
+      id: parseInt(id),
+    });
 
     const currentDate = new Date().toISOString();
 
@@ -85,9 +87,6 @@ const deleteBookList = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
     const { id } = req.params;
     idValidation(id);
-    /**
-     * TODO: only allow admins to delete
-     */
 
     const queryString = `DELETE FROM book_lists WHERE id = ${id}`;
 

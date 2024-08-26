@@ -6,6 +6,7 @@ import {
   creatingBookValidation,
   updatingBookValidation,
 } from '../validation/bookValidation';
+import { User } from '../types/zod';
 
 const getBook = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
@@ -41,7 +42,9 @@ const getBook = async (req: Request, res: Response) => {
 
 const createBook = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
-    const { title, author, link, recommenderId, bookListId } = req.body;
+    const { title, author, link, bookListId } = req.body;
+
+    const { id: recommenderId } = req.user as User;
 
     await creatingBookValidation({
       title,
@@ -50,10 +53,6 @@ const createBook = async (req: Request, res: Response) => {
       recommenderId,
       bookListId,
     });
-
-    /**
-     * only allow admin to create user
-     */
 
     const currentDate = new Date().toISOString();
 
@@ -87,23 +86,20 @@ const createBook = async (req: Request, res: Response) => {
 
 const updateBook = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
-    const { title, author, link, recommenderId, bookListId } = req.body;
+    const { title, author, link, bookListId } = req.body;
     const { id } = req.params;
 
     idValidation(id);
     await updatingBookValidation({
-      id,
+      id: parseInt(id),
       title,
       author,
       link,
-      recommenderId,
       bookListId,
+      user: req.user,
     });
 
     const currentDate = new Date().toISOString();
-
-    /**  TODO: only allow user to edit book with his own recommenderId
-     */
 
     // TODO!! Make sure to change single quote to double quote: https://stackoverflow.com/questions/12316953/insert-text-with-single-quotes-in-postgresql
     const queryString = `
@@ -112,7 +108,6 @@ const updateBook = async (req: Request, res: Response) => {
       ${title ? `title = '${title.replace(`'`, `''`)}', ` : ''}
       ${author ? `author = '${author}', ` : ''}
       ${link ? `link = '${link}', ` : ''} 
-      ${recommenderId ? `recommender_id = '${recommenderId}', ` : ''}
       ${bookListId ? `book_list_id = '${bookListId}', ` : ''}
       last_updated = '${currentDate}'
     WHERE id = ${id}`;
@@ -125,10 +120,6 @@ const updateBook = async (req: Request, res: Response) => {
 
 const deleteBook = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
-    /**
-     * TODO: only allow admins to delete
-     */
-
     const { id } = req.params;
     idValidation(id);
 

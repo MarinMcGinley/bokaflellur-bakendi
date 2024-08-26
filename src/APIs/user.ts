@@ -6,6 +6,8 @@ import {
   updatingUserValidation,
 } from '../validation/userValidation';
 import { errorHelper } from './helpers';
+import { hashPassword } from '../auth/crypt';
+import { requireAdminOrPersonalUser } from '../auth/auth';
 
 const getUser = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
@@ -32,10 +34,6 @@ const createUser = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
     const { firstName, lastName, role, pictureUrl, email, password } = req.body;
 
-    /**
-     * TODO: only allow admin to create user
-     */
-
     await creatingUserValidation({
       firstName,
       lastName,
@@ -44,6 +42,8 @@ const createUser = async (req: Request, res: Response) => {
       email,
       password,
     });
+
+    const hashedPassword = await hashPassword(password);
 
     const currentDate = new Date().toISOString();
 
@@ -67,6 +67,7 @@ const createUser = async (req: Request, res: Response) => {
       role,
       pictureUrl,
       email,
+      hashedPassword,
       currentDate,
       currentDate,
     ];
@@ -78,19 +79,27 @@ const createUser = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
-    // TODO: only allow authorised user or admin to update his/her user
     const { firstName, lastName, pictureUrl, email, password } = req.body;
+    const user = req.user;
 
     const { id } = req.params;
+
+    requireAdminOrPersonalUser(parseInt(id), user);
+
     idValidation(id);
     await updatingUserValidation({
       firstName,
       lastName,
       pictureUrl,
       email,
-      id,
+      id: parseInt(id),
       password,
     });
+
+    let hashedPassword = '';
+    if (password) {
+      hashedPassword = await hashPassword(password);
+    }
 
     const currentDate = new Date().toISOString();
 
@@ -101,7 +110,7 @@ const updateUser = async (req: Request, res: Response) => {
       ${lastName ? `last_name = '${lastName}', ` : ''}
       ${pictureUrl ? `picture = '${pictureUrl}', ` : ''} 
       ${email ? `email = '${email}', ` : ''}
-      ${password ? `password = '${password}', ` : ''}
+      ${password ? `password = '${hashedPassword}', ` : ''}
       last_updated = '${currentDate}'
     WHERE id = ${id}`;
 
@@ -114,9 +123,6 @@ const updateUser = async (req: Request, res: Response) => {
 const deleteUser = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
     const { id } = req.params;
-    /**
-     * TODO: only allow admins to delete
-     */
 
     idValidation(id);
 

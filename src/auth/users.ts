@@ -12,15 +12,10 @@ export const findUserById = async (id: string) => {
 };
 
 export const findUserByEmail = async (email: string) => {
-  const queryString = `SELECT * FROM users WHERE email = ${email}`;
+  const queryString = `SELECT * FROM users WHERE email = '${email}'`;
   const result = await query(queryString);
   if (result.rows.length === 0) {
     throw new Error('No user with this email exists');
   }
   return result.rows[0];
-};
-
-// TODO: need crypto here!!!
-export const comparePasswords = (password: string, hashedPassword: string) => {
-  return password === hashedPassword;
 };

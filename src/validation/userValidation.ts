@@ -1,8 +1,9 @@
+import { requireAdminOrPersonalUser } from '../auth/auth';
 import { query } from '../DB/client';
 import { user, User } from '../types/zod';
 
-export const creatingUserValidation = async (userData: User) => {
-  user.parse(userData);
+export const creatingUserValidation = async (userData: Omit<User, 'id'>) => {
+  user.omit({ id: true }).parse(userData);
 
   const queryString = `SELECT * FROM users WHERE email = '${userData.email}'`;
 
@@ -18,7 +19,7 @@ export const updatingUserValidation = async ({
   pictureUrl,
   email,
   id,
-}: Partial<User> & { id: string }) => {
+}: Partial<User>) => {
   user.partial().parse({ firstName, lastName, pictureUrl, email });
 
   const queryString = `SELECT * FROM users WHERE id = ${id}`;
