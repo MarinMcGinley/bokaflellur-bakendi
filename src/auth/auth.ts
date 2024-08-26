@@ -20,7 +20,6 @@ const opt = {
 };
 
 const strategy: VerifyCallback = async (payload, done) => {
-  console.log({ userpayload: payload });
   const user = await findUserById(payload.id);
   if (user) {
     return done(null, user);
@@ -92,9 +91,7 @@ export const loginRoute = async (req: Request, res: Response) => {
 
     loginValidation(email, password);
 
-    console.log('lsdkjfsdlkfj');
     const user = await findUserByEmail(email);
-    console.log({ user });
 
     if (!user) {
       return res.status(401).send({ status: 401, message: 'No such user' });

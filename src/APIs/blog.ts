@@ -45,12 +45,10 @@ const createBlog = async (req: Request, res: Response) => {
 
     const { id: blogAuthorId } = req.user as User;
 
-    console.log({ blogAuthorId });
-
     await creatingBlogValidation({
       content,
       draft,
-      blogAuthorId: blogAuthorId,
+      blogAuthorId,
       bookId,
     });
 
