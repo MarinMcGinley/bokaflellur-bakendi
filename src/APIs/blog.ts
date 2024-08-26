@@ -6,6 +6,7 @@ import {
   creatingBlogValidation,
   updatingBlogValidation,
 } from '../validation/blogValidation';
+import { User } from '../types/zod';
 
 const getBlog = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
@@ -40,10 +41,16 @@ const getBlog = async (req: Request, res: Response) => {
 
 const createBlog = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
-    // TODO: only allow user to create blog
-    const { content, draft, blogAuthorId, bookId } = req.body;
+    const { content, draft, bookId } = req.body;
 
-    await creatingBlogValidation({ content, draft, blogAuthorId, bookId });
+    const { id: blogAuthorId } = req.user as User;
+
+    await creatingBlogValidation({
+      content,
+      draft,
+      blogAuthorId,
+      bookId,
+    });
 
     const currentDate = new Date().toISOString();
 
@@ -75,12 +82,18 @@ const createBlog = async (req: Request, res: Response) => {
 
 const updateBlog = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
-    //TODO: only allow user and admin to update his/her own blog
     const { content, draft, blogAuthorId, bookId } = req.body;
     const { id } = req.params;
 
     idValidation(id);
-    await updatingBlogValidation({ content, draft, blogAuthorId, bookId, id });
+    await updatingBlogValidation({
+      content,
+      draft,
+      blogAuthorId,
+      bookId,
+      id: parseInt(id),
+      user: req.user,
+    });
 
     const currentDate = new Date().toISOString();
 
@@ -102,10 +115,6 @@ const updateBlog = async (req: Request, res: Response) => {
 
 const deleteBlog = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
-    /**
-     * TODO: only allow admins to delete
-     */
-
     const { id } = req.params;
     idValidation(id);
 

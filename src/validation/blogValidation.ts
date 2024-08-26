@@ -1,8 +1,9 @@
+import { requireAdminOrPersonalUser } from '../auth/auth';
 import { query } from '../DB/client';
 import { blog, Blog } from '../types/zod';
 
-export const creatingBlogValidation = async (blogData: Blog) => {
-  blog.parse(blogData);
+export const creatingBlogValidation = async (blogData: Omit<Blog, 'id'>) => {
+  blog.omit({ id: true }).parse(blogData);
 
   const userQueryString = `SELECT * FROM users WHERE id = ${blogData.blogAuthorId}`;
   const bookQueryString = `SELECT * FROM books WHERE id = ${blogData.bookId}`;
@@ -29,7 +30,8 @@ export const updatingBlogValidation = async ({
   blogAuthorId,
   bookId,
   id,
-}: Partial<Blog> & { id: string }) => {
+  user,
+}: Partial<Blog> & { user: any }) => {
   blog.partial().parse({ content, draft, blogAuthorId, bookId });
 
   const queryString = `SELECT * FROM blogs WHERE id = ${id}`;
@@ -38,6 +40,8 @@ export const updatingBlogValidation = async ({
   if (result.rows.length === 0) {
     throw new Error('No blog with this id exists');
   }
+
+  requireAdminOrPersonalUser(result.rows[0].blog_author_id, user);
 
   if (blogAuthorId) {
     const userQueryString = `SELECT * FROM users WHERE id = ${blogAuthorId}`;

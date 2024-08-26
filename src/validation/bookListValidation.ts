@@ -1,8 +1,10 @@
 import { query } from '../DB/client';
 import { bookList, BookList } from '../types/zod';
 
-export const creatingBookListValidation = async (bookListData: BookList) => {
-  bookList.parse(bookListData);
+export const creatingBookListValidation = async (
+  bookListData: Omit<BookList, 'id'>
+) => {
+  bookList.omit({ id: true }).parse(bookListData);
 };
 
 export const updatingBookListValidation = async ({
@@ -10,7 +12,7 @@ export const updatingBookListValidation = async ({
   description,
   published,
   id,
-}: Partial<BookList> & { id: string }) => {
+}: Partial<BookList>) => {
   bookList.partial().parse({ name, description, published });
 
   const queryString = `SELECT * FROM book_lists WHERE id = ${id}`;

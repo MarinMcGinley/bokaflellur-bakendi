@@ -28,35 +28,38 @@ import {
   updateBlog,
 } from './src/APIs/blog';
 
+import auth, { loginRoute, requireAdmin, requireAuth } from './src/auth/auth';
+
 const app: Express = express();
 
 app.use(express.json());
 
-/**
- * Add authorization and authentication
- */
+app.use(auth);
+
+app.post('/login', loginRoute);
+
 app.get('/books/:id', getBook);
-app.post('/books', createBook);
-app.put('/books/:id', updateBook);
-app.delete('/books/:id', deleteBook);
+app.post('/books', requireAuth, createBook);
+app.put('/books/:id', requireAuth, updateBook);
+app.delete('/books/:id', requireAuth, requireAdmin, deleteBook);
 app.get('/books', getBooks);
 
 app.get('/blogs/:id', getBlog);
-app.post('/blogs', createBlog);
-app.put('/blogs/:id', updateBlog);
-app.delete('/blogs/:id', deleteBlog);
+app.post('/blogs', requireAuth, createBlog);
+app.put('/blogs/:id', requireAuth, updateBlog);
+app.delete('/blogs/:id', requireAuth, requireAdmin, deleteBlog);
 app.get('/blogs', getBlogs);
 
 app.get('/users/:id', getUser);
-app.post('/users', createUser);
-app.put('/users/:id', updateUser);
-app.delete('/users/:id', deleteUser);
+app.post('/users', requireAuth, requireAdmin, createUser);
+app.put('/users/:id', requireAuth, updateUser);
+app.delete('/users/:id', requireAuth, requireAdmin, deleteUser);
 app.get('/users', getUsers);
 
 app.get('/booklists/:id', getBookList);
-app.post('/booklists', createBookList);
-app.put('/booklists/:id', updateBookList);
-app.delete('/booklists/:id', deleteBookList);
+app.post('/booklists', requireAuth, requireAdmin, createBookList);
+app.put('/booklists/:id', requireAuth, requireAdmin, updateBookList);
+app.delete('/booklists/:id', requireAuth, requireAdmin, deleteBookList);
 app.get('/booklists', getBookLists);
 
 export default app;
