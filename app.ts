@@ -30,6 +30,8 @@ import {
 
 import auth, { loginRoute, requireAdmin, requireAuth } from './src/auth/auth';
 
+// TODO! Add sanitization
+
 const app: Express = express();
 
 app.use(express.json());
