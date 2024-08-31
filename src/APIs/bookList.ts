@@ -21,9 +21,9 @@ const getBookList = async (req: Request, res: Response) => {
     const results = await query(queryString);
 
     if (results.rows.length == 0) {
-      res.status(404).send();
+      return res.status(404).send();
     }
-    res.send(results.rows[0]);
+    return res.send(results.rows[0]);
   });
 };
 
@@ -49,7 +49,7 @@ const createBookList = async (req: Request, res: Response) => {
     const values = [name, description, published, currentDate, currentDate];
 
     const results = await query(queryString, values);
-    res.send(results.rows[0]);
+    return res.send(results.rows[0]);
   });
 };
 
@@ -79,7 +79,7 @@ const updateBookList = async (req: Request, res: Response) => {
 
     await query(queryString);
 
-    res.status(204).send();
+    return res.status(204).send();
   });
 };
 
@@ -91,7 +91,7 @@ const deleteBookList = async (req: Request, res: Response) => {
     const queryString = `DELETE FROM book_lists WHERE id = ${id}`;
 
     const result = await query(queryString);
-    res.status(204).send(result);
+    return res.status(204).send(result);
   });
 };
 
@@ -101,7 +101,7 @@ const getBookLists = async (req: Request, res: Response) => {
 
     const results = await query(queryString);
 
-    res.send(results.rows);
+    return res.send(results.rows);
   });
 };
 

@@ -37,8 +37,6 @@ export const updatingBookValidation = async ({
 
   const queryString = `SELECT * FROM books WHERE id = ${id}`;
 
-  // here
-
   const result = await query(queryString);
   if (result.rows.length === 0) {
     throw new Error('No book with this id exists');

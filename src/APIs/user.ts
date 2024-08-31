@@ -24,9 +24,9 @@ const getUser = async (req: Request, res: Response) => {
     const results = await query(queryString);
 
     if (results.rows.length == 0) {
-      res.status(404).send();
+      return res.status(404).send();
     }
-    res.send(results.rows[0]);
+    return res.send(results.rows[0]);
   });
 };
 
@@ -73,7 +73,7 @@ const createUser = async (req: Request, res: Response) => {
     ];
 
     const results = await query(queryString, values);
-    res.send(results.rows[0]);
+    return res.send(results.rows[0]);
   });
 };
 
@@ -116,7 +116,7 @@ const updateUser = async (req: Request, res: Response) => {
 
     await query(queryString);
 
-    res.status(204).send();
+    return res.status(204).send();
   });
 };
 
@@ -129,7 +129,7 @@ const deleteUser = async (req: Request, res: Response) => {
     const queryString = `DELETE FROM users WHERE id = ${id}`;
 
     const result = await query(queryString);
-    res.status(204).send(result);
+    return res.status(204).send(result);
   });
 };
 
@@ -139,7 +139,7 @@ const getUsers = async (req: Request, res: Response) => {
 
     const results = await query(queryString);
 
-    res.send(results.rows);
+    return res.send(results.rows);
   });
 };
 

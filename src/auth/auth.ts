@@ -52,12 +52,8 @@ export const requireAdminOrPersonalUser = (userId: number, user: any) => {
   }
 };
 
-export const requireAuth = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  return passport.authenticate(
+export const requireAuth = (req: Request, res: Response, next: NextFunction) =>
+  passport.authenticate(
     'jwt',
     { session: false },
     (
@@ -83,7 +79,6 @@ export const requireAuth = (
       return next();
     }
   )(req, res, next);
-};
 
 export const loginRoute = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {

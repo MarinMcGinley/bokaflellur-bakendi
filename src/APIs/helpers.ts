@@ -3,10 +3,9 @@ import { Request, Response } from 'express';
 export const errorHelper = async (
   req: Request,
   res: Response,
-  func: (reqx: Request, resx: Response) => void
+  func: (reqx: Request, resx: Response) => Promise<Response>
 ) => {
   try {
-    // TODO: Why is typescript telling me 'await' is not needed??
     await func(req, res);
   } catch (e) {
     console.error({ error: e });

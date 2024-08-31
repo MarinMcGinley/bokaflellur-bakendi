@@ -19,11 +19,11 @@ const getBlog = async (req: Request, res: Response) => {
       blogs.id, 
       content, 
       draft,  
-      users.id as blogAuthorId, 
-      users.first_name as blogAuthorFirstName, 
-      users.last_name as blogAuthorLastName, 
-      books.id as bookId, 
-      books.title as bookTitle
+      users.id as blog_author_id, 
+      users.first_name as blog_author_firstName, 
+      users.last_name as blog_author_lastName, 
+      books.id as book_id, 
+      books.title as book_title
     FROM blogs 
       LEFT OUTER JOIN users ON blogs.blog_author_id = users.id
       LEFT OUTER JOIN books ON blogs.book_id = books.id    
@@ -33,9 +33,9 @@ const getBlog = async (req: Request, res: Response) => {
     const results = await query(queryString);
 
     if (results.rows.length == 0) {
-      res.status(404).send();
+      return res.status(404).send();
     }
-    res.send(results.rows[0]);
+    return res.send(results.rows[0]);
   });
 };
 
@@ -76,7 +76,7 @@ const createBlog = async (req: Request, res: Response) => {
     ];
 
     const results = await query(queryString, values);
-    res.send(results.rows[0]);
+    return res.send(results.rows[0]);
   });
 };
 
@@ -109,7 +109,7 @@ const updateBlog = async (req: Request, res: Response) => {
 
     await query(queryString);
 
-    res.status(204).send();
+    return res.status(204).send();
   });
 };
 
@@ -121,7 +121,7 @@ const deleteBlog = async (req: Request, res: Response) => {
     const queryString = `DELETE FROM blogs WHERE id = ${id}`;
 
     const result = await query(queryString);
-    res.status(204).send(result);
+    return res.status(204).send(result);
   });
 };
 
@@ -132,18 +132,18 @@ const getBlogs = async (req: Request, res: Response) => {
       blogs.id, 
       content, 
       draft,  
-      users.id as blogAuthorId, 
-      users.first_name as blogAuthorFirstName, 
-      users.last_name as blogAuthorLastName, 
-      books.id as bookId, 
-      books.title as bookTitle
+      users.id as blog_author_id, 
+      users.first_name as blog_author_first_name, 
+      users.last_name as blog_author_last_name, 
+      books.id as book_id, 
+      books.title as book_title
     FROM blogs 
       LEFT OUTER JOIN users ON blogs.blog_author_id = users.id
       LEFT OUTER JOIN books ON blogs.book_id = books.id`;
 
     const results = await query(queryString);
 
-    res.send(results.rows);
+    return res.send(results.rows);
   });
 };
 

@@ -34,9 +34,9 @@ const getBook = async (req: Request, res: Response) => {
     const results = await query(queryString);
 
     if (results.rows.length == 0) {
-      res.status(404).send();
+      return res.status(404).send();
     }
-    res.send(results.rows[0]);
+    return res.send(results.rows[0]);
   });
 };
 
@@ -80,7 +80,7 @@ const createBook = async (req: Request, res: Response) => {
     ];
 
     const results = await query(queryString, values);
-    res.send(results.rows[0]);
+    return res.send(results.rows[0]);
   });
 };
 
@@ -114,7 +114,7 @@ const updateBook = async (req: Request, res: Response) => {
 
     await query(queryString);
 
-    res.status(204).send();
+    return res.status(204).send();
   });
 };
 
@@ -126,17 +126,27 @@ const deleteBook = async (req: Request, res: Response) => {
     const queryString = `DELETE FROM books WHERE id = ${id}`;
 
     const result = await query(queryString);
-    res.status(204).send(result);
+    return res.status(204).send(result);
   });
 };
 
 const getBooks = async (req: Request, res: Response) => {
   errorHelper(req, res, async (_req, res) => {
-    const queryString = `SELECT id, title, author, link, recommender_id, book_list_id, created, last_updated FROM books`;
+    const queryString = `
+    SELECT 
+      id, 
+      title, 
+      author, 
+      link, 
+      recommender_id, 
+      book_list_id, 
+      created, 
+      last_updated 
+    FROM books`;
 
     const results = await query(queryString);
 
-    res.send(results.rows);
+    return res.send(results.rows);
   });
 };
 
