@@ -32,10 +32,12 @@ const insertAdmin = async () => {
 const setup = async () => {
   await client.connect();
 
-  await query('DROP TABLE IF EXISTS users CASCADE');
-  await query('DROP TABLE IF EXISTS book_lists CASCADE');
-  await query('DROP TABLE IF EXISTS books CASCADE');
-  await query('DROP TABLE IF EXISTS blogs CASCADE');
+  const users = query('DROP TABLE IF EXISTS users CASCADE');
+  const bookLists = query('DROP TABLE IF EXISTS book_lists CASCADE');
+  const books = query('DROP TABLE IF EXISTS books CASCADE');
+  const blogs = query('DROP TABLE IF EXISTS blogs CASCADE');
+
+  await Promise.all([users, bookLists, books, blogs]);
 
   console.log('All tables dropped');
 

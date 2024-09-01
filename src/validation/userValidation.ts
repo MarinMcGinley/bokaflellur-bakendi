@@ -39,6 +39,6 @@ export const updatingUserValidation = async ({
   }
 };
 
-export const loginValidation = async (email: string, password: string) => {
+export const loginValidation = (email: string, password: string) => {
   user.pick({ email: true, password: true }).parse({ email, password });
 };

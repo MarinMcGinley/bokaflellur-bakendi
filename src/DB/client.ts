@@ -10,12 +10,8 @@ const client = new Client({
 });
 
 client.on('error', (error: Error) => {
-  console.log('DB client error', error);
+  console.error('DB client error', error);
 });
-
-type t = Parameters<typeof client.query>;
-
-type s = t[number];
 
 const query = async (queryText: string, values?: Array<string | number>) => {
   const result = await client.query(queryText, values);

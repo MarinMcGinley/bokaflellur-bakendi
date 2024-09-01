@@ -20,11 +20,10 @@ export const errorHelper = async (
         status: 400,
         message: (e as Error).message,
       });
-    } else {
-      return res.status(500).send({
-        status: 500,
-        message: e,
-      });
     }
+    return res.status(500).send({
+      status: 500,
+      message: e,
+    });
   }
 };
