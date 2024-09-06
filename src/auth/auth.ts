@@ -5,7 +5,7 @@ import express, { NextFunction } from 'express';
 import { Request, Response } from 'express';
 import { loginValidation } from '../validation/userValidation';
 import { errorHelper } from '../APIs/helpers';
-import { sign } from 'jsonwebtoken';
+import { sign, SignOptions } from 'jsonwebtoken';
 import { User } from '../types/zod';
 import { comparePasswords } from './crypt';
 
@@ -92,11 +92,14 @@ export const loginRoute = async (req: Request, res: Response) => {
       return res.status(401).send({ status: 401, message: 'No such user' });
     }
 
-    const passwordIsCorrect = await comparePasswords(password, user.password);
+    const passwordIsCorrect = await comparePasswords(password, user.password!);
 
     if (passwordIsCorrect) {
       const payload = { id: user.id };
-      const tokenOptions = { expiresIn: Number(tokenLifetime) };
+      const tokenOptions: SignOptions = {
+        expiresIn: Number(tokenLifetime),
+        algorithm: 'HS256',
+      };
       const token = sign(payload, opt.secretOrKey, tokenOptions);
 
       delete user.password;

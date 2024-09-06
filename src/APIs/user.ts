@@ -8,6 +8,8 @@ import {
 import { errorHelper } from './helpers';
 import { hashPassword } from '../auth/crypt';
 import { requireAdminOrPersonalUser } from '../auth/auth';
+import { DBUser } from '../types/dbTypes';
+import { mapUser } from '../utils/mappings';
 
 const getUser = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
@@ -21,12 +23,14 @@ const getUser = async (req: Request, res: Response) => {
     WHERE id = ${id}
     `;
 
-    const results = await query(queryString);
+    const results = await query<Omit<DBUser, 'password'>>(queryString);
 
     if (results.rows.length == 0) {
       return res.status(404).send();
     }
-    return res.send(results.rows[0]);
+
+    const mappedResults = results.rows.map(mapUser);
+    return res.send(mappedResults[0]);
   });
 };
 
@@ -72,8 +76,10 @@ const createUser = async (req: Request, res: Response) => {
       currentDate,
     ];
 
-    const results = await query(queryString, values);
-    return res.send(results.rows[0]);
+    const results = await query<DBUser>(queryString, values);
+    const mappedResults = results.rows.map(mapUser);
+
+    return res.send(mappedResults[0]);
   });
 };
 
@@ -114,7 +120,7 @@ const updateUser = async (req: Request, res: Response) => {
       last_updated = '${currentDate}'
     WHERE id = ${id}`;
 
-    await query(queryString);
+    await query<DBUser>(queryString);
 
     return res.status(204).send();
   });
@@ -128,8 +134,8 @@ const deleteUser = async (req: Request, res: Response) => {
 
     const queryString = `DELETE FROM users WHERE id = ${id}`;
 
-    const result = await query(queryString);
-    return res.status(204).send(result);
+    await query(queryString);
+    return res.status(204).send();
   });
 };
 
@@ -137,9 +143,11 @@ const getUsers = async (req: Request, res: Response) => {
   errorHelper(req, res, async (_req, res) => {
     const queryString = `SELECT id, first_name, last_name, role, picture, email FROM users`;
 
-    const results = await query(queryString);
+    const results = await query<DBUser>(queryString);
 
-    return res.send(results.rows);
+    const mappedResults = results.rows.map(mapUser);
+
+    return res.send(mappedResults);
   });
 };
 

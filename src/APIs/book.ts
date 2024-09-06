@@ -7,6 +7,8 @@ import {
   updatingBookValidation,
 } from '../validation/bookValidation';
 import { User } from '../types/zod';
+import { mapBook } from '../utils/mappings';
+import { DBBook } from '../types/dbTypes';
 
 const getBook = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
@@ -31,12 +33,13 @@ const getBook = async (req: Request, res: Response) => {
     WHERE books.id = ${id}
   `;
 
-    const results = await query(queryString);
+    const results = await query<DBBook>(queryString);
 
     if (results.rows.length == 0) {
       return res.status(404).send();
     }
-    return res.send(results.rows[0]);
+    const mappedResults = results.rows.map(mapBook);
+    return res.send(mappedResults[0]);
   });
 };
 
@@ -79,8 +82,10 @@ const createBook = async (req: Request, res: Response) => {
       currentDate,
     ];
 
-    const results = await query(queryString, values);
-    return res.send(results.rows[0]);
+    const results = await query<DBBook>(queryString, values);
+    const mappedResults = results.rows.map(mapBook);
+
+    return res.send(mappedResults[0]);
   });
 };
 
@@ -125,8 +130,8 @@ const deleteBook = async (req: Request, res: Response) => {
 
     const queryString = `DELETE FROM books WHERE id = ${id}`;
 
-    const result = await query(queryString);
-    return res.status(204).send(result);
+    await query(queryString);
+    return res.status(204).send();
   });
 };
 
@@ -144,9 +149,10 @@ const getBooks = async (req: Request, res: Response) => {
       last_updated 
     FROM books`;
 
-    const results = await query(queryString);
+    const results = await query<DBBook>(queryString);
 
-    return res.send(results.rows);
+    const mappedResults = results.rows.map(mapBook);
+    return res.send(mappedResults);
   });
 };
 

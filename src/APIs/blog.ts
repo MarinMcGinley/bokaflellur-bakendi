@@ -7,6 +7,8 @@ import {
   updatingBlogValidation,
 } from '../validation/blogValidation';
 import { User } from '../types/zod';
+import { DBBlog } from '../types/dbTypes';
+import { mapBlog } from '../utils/mappings';
 
 const getBlog = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
@@ -20,8 +22,8 @@ const getBlog = async (req: Request, res: Response) => {
       content, 
       draft,  
       users.id as blog_author_id, 
-      users.first_name as blog_author_firstName, 
-      users.last_name as blog_author_lastName, 
+      users.first_name as blog_author_first_name, 
+      users.last_name as blog_author_last_name, 
       books.id as book_id, 
       books.title as book_title
     FROM blogs 
@@ -30,12 +32,13 @@ const getBlog = async (req: Request, res: Response) => {
     WHERE blogs.id = ${id}
   `;
 
-    const results = await query(queryString);
+    const results = await query<DBBlog>(queryString);
 
     if (results.rows.length == 0) {
       return res.status(404).send();
     }
-    return res.send(results.rows[0]);
+    const mappedResults = results.rows.map(mapBlog);
+    return res.send(mappedResults[0]);
   });
 };
 
@@ -75,8 +78,10 @@ const createBlog = async (req: Request, res: Response) => {
       currentDate,
     ];
 
-    const results = await query(queryString, values);
-    return res.send(results.rows[0]);
+    const results = await query<DBBlog>(queryString, values);
+    const mappedResults = results.rows.map(mapBlog);
+
+    return res.send(mappedResults[0]);
   });
 };
 
@@ -120,13 +125,13 @@ const deleteBlog = async (req: Request, res: Response) => {
 
     const queryString = `DELETE FROM blogs WHERE id = ${id}`;
 
-    const result = await query(queryString);
-    return res.status(204).send(result);
+    await query(queryString);
+    return res.status(204).send();
   });
 };
 
 const getBlogs = async (req: Request, res: Response) => {
-  errorHelper(req, res, async (req, res) => {
+  errorHelper(req, res, async (_req, res) => {
     const queryString = `
     SELECT 
       blogs.id, 
@@ -141,9 +146,10 @@ const getBlogs = async (req: Request, res: Response) => {
       LEFT OUTER JOIN users ON blogs.blog_author_id = users.id
       LEFT OUTER JOIN books ON blogs.book_id = books.id`;
 
-    const results = await query(queryString);
+    const results = await query<DBBlog>(queryString);
+    const mappedResults = results.rows.map(mapBlog);
 
-    return res.send(results.rows);
+    return res.send(mappedResults);
   });
 };
 

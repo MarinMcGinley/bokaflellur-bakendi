@@ -6,6 +6,8 @@ import {
   creatingBookListValidation,
   updatingBookListValidation,
 } from '../validation/bookListValidation';
+import { DBBookList } from '../types/dbTypes';
+import { mapBookList } from '../utils/mappings';
 
 const getBookList = async (req: Request, res: Response) => {
   errorHelper(req, res, async (req, res) => {
@@ -18,12 +20,14 @@ const getBookList = async (req: Request, res: Response) => {
     WHERE id = ${id}
   `;
 
-    const results = await query(queryString);
+    const results = await query<DBBookList>(queryString);
 
     if (results.rows.length == 0) {
       return res.status(404).send();
     }
-    return res.send(results.rows[0]);
+
+    const mappedResults = results.rows.map(mapBookList);
+    return res.send(mappedResults[0]);
   });
 };
 
@@ -48,8 +52,10 @@ const createBookList = async (req: Request, res: Response) => {
 
     const values = [name, description, published, currentDate, currentDate];
 
-    const results = await query(queryString, values);
-    return res.send(results.rows[0]);
+    const results = await query<DBBookList>(queryString, values);
+    const mappedResults = results.rows.map(mapBookList);
+
+    return res.send(mappedResults[0]);
   });
 };
 
@@ -90,8 +96,8 @@ const deleteBookList = async (req: Request, res: Response) => {
 
     const queryString = `DELETE FROM book_lists WHERE id = ${id}`;
 
-    const result = await query(queryString);
-    return res.status(204).send(result);
+    await query(queryString);
+    return res.status(204).send();
   });
 };
 
@@ -99,9 +105,10 @@ const getBookLists = async (req: Request, res: Response) => {
   errorHelper(req, res, async (_req, res) => {
     const queryString = `SELECT * FROM book_lists`;
 
-    const results = await query(queryString);
+    const results = await query<DBBookList>(queryString);
 
-    return res.send(results.rows);
+    const mappedResults = results.rows.map(mapBookList);
+    return res.send(mappedResults);
   });
 };
 
