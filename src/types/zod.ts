@@ -35,6 +35,12 @@ export const bookList = z.object({
 });
 export type BookList = z.infer<typeof bookList>;
 
+export const extendedBookList = bookList.extend({
+  books: z.array(book),
+});
+
+export type ExtendedBookList = z.infer<typeof extendedBookList>;
+
 export const blog = z.object({
   id: z.number(),
   content: z.string(),
