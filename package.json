@@ -7,7 +7,8 @@
     "build": "npx tsc",
     "start": "node dist/index.js",
     "dev": "nodemon index.ts",
-    "setup": "nodemon setup.ts"
+    "setup": "node dist/setup.js",
+    "mock-data": "node dist/mockDataSetup.js"
   },
   "author": "Marín Ingibjörg McGinley",
   "license": "ISC",

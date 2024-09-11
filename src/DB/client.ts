@@ -15,7 +15,7 @@ client.on('error', (error: Error) => {
 
 const query = async <T>(
   queryText: string,
-  values?: Array<string | number>
+  values?: Array<string | number | boolean>
 ): Promise<{ rows: T[] }> => {
   const result = await client.query(queryText, values);
   return result;

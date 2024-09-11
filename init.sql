@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS book_lists (
 
 CREATE TABLE IF NOT EXISTS books (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    title VARCHAR(50) NOT NULL,
-    author VARCHAR(50) NOT NULL,
-    link VARCHAR(50) NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    author VARCHAR(100) NOT NULL,
+    link VARCHAR(200) NOT NULL,
     recommender_id INT NOT NULL,
     book_list_id INT NOT NULL,
     created TIMESTAMPTZ NOT NULL,
